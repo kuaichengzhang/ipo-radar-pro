@@ -13,7 +13,7 @@ def generate_report(items):
     filename = REPORT_DIR / f"report_{now.strftime('%Y%m%d_%H%M%S')}.md"
 
     lines = [
-        "# IPO Radar Daily Report",
+        "# IPO Radar Daily Report V2 HKEX TEST",
         "",
         f"生成时间：{now.strftime('%Y-%m-%d %H:%M:%S')}",
         "",
