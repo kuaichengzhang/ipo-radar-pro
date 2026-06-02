@@ -45,16 +45,27 @@ def generate_report(items):
 
 
 def main():
+    print("========== IPO RADAR START ==========")
+
     all_items = []
 
     try:
+        print("Fetching CSRC data...")
+
         csrc_items = fetch_csrc_items()
-        all_items.extend(csrc_items)
+
         print(f"CSRC items fetched: {len(csrc_items)}")
+
+        all_items.extend(csrc_items)
+
     except Exception as e:
-        print("CSRC fetch failed:", e)
+        print("CSRC fetch failed:")
+        print(str(e))
 
     generate_report(all_items)
+
+    print("Report generated.")
+    print("========== IPO RADAR END ==========")
 
 
 if __name__ == "__main__":
