@@ -1,43 +1,61 @@
 from datetime import datetime
 from pathlib import Path
 
-# 创建 reports 目录
+from ipo_radar.csrc import fetch_csrc_items
+
 REPORT_DIR = Path("reports")
 REPORT_DIR.mkdir(exist_ok=True)
 
-# 当前时间
-now = datetime.now()
 
-# 生成日报内容
-report_content = f"""
-# IPO Radar Daily Report
+def generate_report(items):
+    now = datetime.now()
+    filename = REPORT_DIR / f"report_{now.strftime('%Y%m%d_%H%M%S')}.md"
 
-生成时间：{now.strftime("%Y-%m-%d %H:%M:%S")}
+    lines = []
+    lines.append("# IPO Radar Daily Report")
+    lines.append("")
+    lines.append(f"生成时间：{now.strftime('%Y-%m-%d %H:%M:%S')}")
+    lines.append("")
+    lines.append("## 今日监控源")
+    lines.append("")
+    lines.append("- 证监会境外上市备案")
+    lines.append("")
+    lines.append("## 抓取结果")
+    lines.append("")
 
-## 系统状态
+    if not items:
+        lines.append("暂无抓取到相关IPO备案动态。")
+    else:
+        lines.append(f"共抓取到 {len(items)} 条相关动态。")
+        lines.append("")
 
-✅ GitHub Actions 运行成功
+        for idx, item in enumerate(items, start=1):
+            lines.append(f"### {idx}. {item['title']}")
+            lines.append("")
+            lines.append(f"- 来源：{item['source']}")
+            lines.append(f"- 市场：{item['market']}")
+            lines.append(f"- 状态：{item['status']}")
+            lines.append(f"- 链接：{item['url']}")
+            lines.append("")
 
-## 后续计划
+    with open(filename, "w", encoding="utf-8") as f:
+        f.write("\n".join(lines))
 
-- 港交所递表监控
-- 上交所IPO审核监控
-- 深交所IPO审核监控
-- 证监会境外备案监控
-- 医疗IPO分类
-- AI IPO分类
-- 半导体IPO分类
-- 风险信号扫描
+    print("Report generated:", filename)
 
----
 
-IPO Radar Pro v1.0
-"""
+def main():
+    all_items = []
 
-# 保存文件
-filename = REPORT_DIR / f"report_{now.strftime('%Y%m%d_%H%M%S')}.md"
+    try:
+        csrc_items = fetch_csrc_items()
+        all_items.extend(csrc_items)
+        print(f"CSRC items fetched: {len(csrc_items)}")
+    except Exception as e:
+        print("CSRC fetch failed:", e)
 
-with open(filename, "w", encoding="utf-8") as f:
-    f.write(report_content)
+    generate_report(all_items)
 
-print("Report generated:", filename)
+
+if __name__ == "__main__":
+    main()
